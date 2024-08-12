@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Michelson Interferometer Simulation</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin-top: 50px;
+        }
+        canvas {
+            border: 1px solid black;
+        }
+        input {
+            margin: 20px;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Michelson Interferometer Simulation</h1>
+    <p>Adjust the optical path difference to observe the interference pattern.</p>
+
+    <label for="pathDifference">Optical Path Difference (ΔL): </label>
+    <input type="range" id="pathDifference" min="0" max="100" value="0">
+    <span id="pathDifferenceValue">0</span> λ
+
+    <br><br>
+
+    <canvas id="interferenceCanvas" width="600" height="300"></canvas>
+
+    <script>
+        const canvas = document.getElementById('interferenceCanvas');
+        const ctx = canvas.getContext('2d');
+        const pathDifferenceSlider = document.getElementById('pathDifference');
+        const pathDifferenceValue = document.getElementById('pathDifferenceValue');
+
+        // Parameters
+        const lambda = 900; // Wavelength in nm (for visualization purposes)
+        const intensityMax = 255; // Max intensity for color
+
+        function drawInterferencePattern(deltaL) {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            const centerX = canvas.width / 2;
+            const centerY = canvas.height / 2;
+            const fringeWidth = canvas.width / 20;
+
+            for (let x = 0; x < canvas.width; x++) {
+                const pathDiff = deltaL + (x - centerX) * (lambda / fringeWidth);
+                const phaseDiff = (2 * Math.PI * pathDiff) / lambda;
+                const intensity = Math.cos(phaseDiff) ** 2;
+
+                ctx.fillStyle = `rgb(${intensity * intensityMax},${intensity * intensityMax},${intensity * intensityMax})`;
+                ctx.fillRect(x, 0, 1, canvas.height);
+            }
+        }
+
+        // Update the simulation when the slider is adjusted
+        pathDifferenceSlider.addEventListener('input', function () {
+            const deltaL = parseFloat(this.value);
+            pathDifferenceValue.textContent = deltaL.toFixed(1);
+            drawInterferencePattern(deltaL);
+        });
+
+        // Initial drawing
+        drawInterferencePattern(0);
+
+    </script>
+</body>
+</html>

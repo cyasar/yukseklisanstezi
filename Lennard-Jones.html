@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lennard-Jones Potansiyeli Simülasyonu</title>
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+</head>
+<body>
+    <h2>Lennard-Jones Potansiyeli Simülasyonu</h2>
+    <div id="plot"></div>
+
+    <script>
+        // Simülasyon parametreleri
+        const epsilon = 1.0;
+        const sigma = 1.0;
+        const dt = 0.01;
+        const steps = 1000;
+
+        // Lennard-Jones potansiyeli
+        function lennardJonesPotential(r, epsilon, sigma) {
+            return 4 * epsilon * (Math.pow(sigma / r, 12) - Math.pow(sigma / r, 6));
+        }
+
+        // İki atomun başlangıç pozisyonları
+        let r1 = 1.5;
+        let r2 = 2.5;
+        let v1 = 0.0;
+        let v2 = 0.0;
+
+        // Zaman evrimi
+        let positions1 = [];
+        let positions2 = [];
+        let times = [];
+
+        for (let t = 0; t < steps; t++) {
+            let r = Math.abs(r2 - r1);
+            let force = -48 * epsilon * ((Math.pow(sigma, 12) / Math.pow(r, 13)) - 0.5 * (Math.pow(sigma, 6) / Math.pow(r, 7)));
+
+            // Hızları güncelleme (Newton'un ikinci yasası)
+            v1 += force * dt;
+            v2 -= force * dt;
+
+            // Pozisyonları güncelleme
+            r1 += v1 * dt;
+            r2 += v2 * dt;
+
+            // Değerleri kaydetme
+            positions1.push(r1);
+            positions2.push(r2);
+            times.push(t * dt);
+        }
+
+        // Grafiği çizme
+        const trace1 = {
+            x: times,
+            y: positions1,
+            mode: 'lines',
+            name: 'Atom 1 Pozisyonu'
+        };
+
+        const trace2 = {
+            x: times,
+            y: positions2,
+            mode: 'lines',
+            name: 'Atom 2 Pozisyonu'
+        };
+
+        const layout = {
+            title: 'İki Atomun Zamanla Pozisyonlarının Değişimi (Lennard-Jones Potansiyeli)',
+            xaxis: { title: 'Zaman' },
+            yaxis: { title: 'Pozisyon' }
+        };
+
+        Plotly.newPlot('plot', [trace1, trace2], layout);
+    </script>
+</body>
+</html>

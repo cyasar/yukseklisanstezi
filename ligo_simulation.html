@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LIGO-like Michelson Interferometer Simulation</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin-top: 50px;
+        }
+        canvas {
+            border: 1px solid black;
+        }
+        input {
+            margin: 20px;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Michelson Interferometer Simulation (LIGO-like)</h1>
+    <p>Simulating the effect of gravitational waves on the interference pattern.</p>
+
+    <label for="waveAmplitude">Gravitational Wave Amplitude (h): </label>
+    <input type="range" id="waveAmplitude" min="0" max="1" step="0.01" value="0.5">
+    <span id="waveAmplitudeValue">0.50</span>
+
+    <br><br>
+
+    <canvas id="interferenceCanvas" width="600" height="300"></canvas>
+
+    <script>
+        const canvas = document.getElementById('interferenceCanvas');
+        const ctx = canvas.getContext('2d');
+        const waveAmplitudeSlider = document.getElementById('waveAmplitude');
+        const waveAmplitudeValue = document.getElementById('waveAmplitudeValue');
+
+        // Parameters
+        const lambda = 1064; // Wavelength in nm (YAG laser used in LIGO)
+        const intensityMax = 255; // Max intensity for color
+        const baseLength = 4000000; // Length of interferometer arms in meters (4 km)
+
+        function drawInterferencePattern(h) {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            const centerX = canvas.width / 2;
+            const centerY = canvas.height / 2;
+            const fringeWidth = canvas.width / 20;
+
+            for (let x = 0; x < canvas.width; x++) {
+                // Simulate the effect of the gravitational wave on the arm lengths
+                const deltaL = h * baseLength / 2;
+                const pathDiff = deltaL + (x - centerX) * (lambda / fringeWidth);
+                const phaseDiff = (2 * Math.PI * pathDiff) / lambda;
+                const intensity = Math.cos(phaseDiff) ** 2;
+
+                ctx.fillStyle = `rgb(${intensity * intensityMax},${intensity * intensityMax},${intensity * intensityMax})`;
+                ctx.fillRect(x, 0, 1, canvas.height);
+            }
+        }
+
+        // Update the simulation when the slider is adjusted
+        waveAmplitudeSlider.addEventListener('input', function () {
+            const h = parseFloat(this.value);
+            waveAmplitudeValue.textContent = h.toFixed(2);
+            drawInterferencePattern(h);
+        });
+
+        // Initial drawing
+        drawInterferencePattern(0.5);
+
+    </script>
+</body>
+</html>

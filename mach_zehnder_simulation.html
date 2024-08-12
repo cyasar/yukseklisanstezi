@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mach-Zehnder Interferometer Simulation</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin-top: 50px;
+        }
+        canvas {
+            border: 1px solid black;
+            margin-top: 20px;
+        }
+        input {
+            margin: 20px;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Mach-Zehnder Interferometer Simulation</h1>
+    <p>Adjust the phase shift to observe the interference pattern.</p>
+
+    <label for="phaseShift">Phase Shift (φ): </label>
+    <input type="range" id="phaseShift" min="0" max="6.28" step="0.01" value="0">
+    <span id="phaseShiftValue">0.00</span> radians
+
+    <br><br>
+
+    <canvas id="interferenceCanvas" width="600" height="300"></canvas>
+
+    <script>
+        const canvas = document.getElementById('interferenceCanvas');
+        const ctx = canvas.getContext('2d');
+        const phaseShiftSlider = document.getElementById('phaseShift');
+        const phaseShiftValue = document.getElementById('phaseShiftValue');
+
+        // Parameters
+        const lambda = 600; // Wavelength in nm (for visualization purposes)
+        const intensityMax = 255; // Max intensity for color
+
+        function drawInterferencePattern(phaseShift) {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            const centerX = canvas.width / 2;
+            const fringeWidth = canvas.width / 20;
+
+            for (let x = 0; x < canvas.width; x++) {
+                const pathDiff = (x - centerX) * (lambda / fringeWidth);
+                const phaseDiff = (2 * Math.PI * pathDiff) / lambda + phaseShift;
+                const intensity = Math.cos(phaseDiff) ** 2;
+
+                ctx.fillStyle = `rgb(${intensity * intensityMax},${intensity * intensityMax},${intensity * intensityMax})`;
+                ctx.fillRect(x, 0, 1, canvas.height);
+            }
+        }
+
+        // Update the simulation when the slider is adjusted
+        phaseShiftSlider.addEventListener('input', function () {
+            const phaseShift = parseFloat(this.value);
+            phaseShiftValue.textContent = phaseShift.toFixed(2);
+            drawInterferencePattern(phaseShift);
+        });
+
+        // Initial drawing
+        drawInterferencePattern(0);
+
+    </script>
+</body>
+</html>

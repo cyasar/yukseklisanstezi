@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kuantum Algılama ve Metroloji Simülasyonu</title>
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f4f4f4;
+        }
+        h2 {
+            color: #333;
+        }
+        #plot {
+            width: 100%;
+            height: 600px;
+        }
+    </style>
+</head>
+<body>
+    <h2>Kuantum Algılama ve Metroloji Simülasyonu: Sıkıştırılmış Işık Kuadratur Bileşenleri</h2>
+    <div id="plot"></div>
+
+    <script>
+        // Simülasyon parametreleri
+        const r = 0.7;  // Sıkıştırma parametresi
+        const omega = 1.0;  // Frekans
+        const dt = 0.01;  // Zaman adımı
+        const steps = 1000;  // Simülasyon adım sayısı
+        const theta = Array.from({length: steps}, (_, i) => i * 2 * Math.PI / steps);  // Faz aralığı
+
+        // Kuadratur bileşenlerini hesaplama
+        let X = [];
+        let P = [];
+        theta.forEach(t => {
+            X.push(Math.exp(-r) * Math.cos(omega * t));  // X Kuadratur bileşeni
+            P.push(Math.exp(r) * Math.sin(omega * t));   // P Kuadratur bileşeni
+        });
+
+        // Grafikleri oluşturma
+        const traceX = {
+            x: theta,
+            y: X,
+            mode: 'lines',
+            name: 'X Kuadratur',
+            line: { color: 'blue' }
+        };
+
+        const traceP = {
+            x: theta,
+            y: P,
+            mode: 'lines',
+            name: 'P Kuadratur',
+            line: { color: 'orange' }
+        };
+
+        const layout = {
+            title: 'Sıkıştırılmış Işık Kuadratur Bileşenlerinin Zamanla Değişimi',
+            xaxis: { title: 'Faz (rad)' },
+            yaxis: { title: 'Kuadratur Değeri' }
+        };
+
+        Plotly.newPlot('plot', [traceX, traceP], layout);
+    </script>
+</body>
+</html>

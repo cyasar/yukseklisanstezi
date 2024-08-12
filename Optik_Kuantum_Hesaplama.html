@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Optik Kuantum Hesaplama Simülasyonu</title>
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+</head>
+<body>
+    <h2>Optik Kuantum Hesaplama: Sıkıştırılmış Işık Simülasyonu</h2>
+    <div id="plot"></div>
+
+    <script>
+        // Simülasyon parametreleri
+        const r = 0.5;  // Sıkıştırma parametresi
+        const omega = 1.0;  // Frekans
+        const dt = 0.01;  // Zaman adımı
+        const steps = 1000;  // Adım sayısı
+
+        // Sıkıştırılmış ışık için kuadraturlar
+        let X = [];
+        let P = [];
+        let times = [];
+
+        for (let t = 0; t < steps; t++) {
+            let time = t * dt;
+            let X_t = Math.exp(-r) * Math.cos(omega * time);  // X Kuadratur bileşeni
+            let P_t = Math.exp(r) * Math.sin(omega * time);  // P Kuadratur bileşeni
+
+            X.push(X_t);
+            P.push(P_t);
+            times.push(time);
+        }
+
+        // X ve P kuadratur bileşenlerini zamanla görselleştirme
+        const traceX = {
+            x: times,
+            y: X,
+            mode: 'lines',
+            name: 'X Kuadratur',
+            line: { color: 'blue' }
+        };
+
+        const traceP = {
+            x: times,
+            y: P,
+            mode: 'lines',
+            name: 'P Kuadratur',
+            line: { color: 'orange' }
+        };
+
+        const layout = {
+            title: 'Sıkıştırılmış Işık Kuadratur Bileşenlerinin Zamanla Değişimi',
+            xaxis: { title: 'Zaman' },
+            yaxis: { title: 'Kuadratur Değeri' }
+        };
+
+        Plotly.newPlot('plot', [traceX, traceP], layout);
+    </script>
+</body>
+</html>
