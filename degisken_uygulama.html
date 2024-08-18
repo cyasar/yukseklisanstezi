@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Değişken Kavramı Simülasyonu</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            padding: 20px;
+        }
+        .container {
+            margin: 20px auto;
+            width: 300px;
+        }
+        #continuousResult, #discreteResult {
+            font-size: 24px;
+            margin-top: 10px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <h1>Değişken Kavramı Simülasyonu</h1>
+    <div class="container">
+        <h2>Sürekli Değişken</h2>
+        <input type="range" id="continuousSlider" min="0" max="100" value="50" step="0.01" oninput="updateContinuousValue()">
+        <div id="continuousResult">Seçilen Değer: 50</div>
+    </div>
+
+    <div class="container">
+        <h2>Kesikli Değişken</h2>
+        <button onclick="generateDiscreteValue()">Rastgele Bir Değer Seç</button>
+        <div id="discreteResult">Seçilen Değer: 1</div>
+    </div>
+
+    <script>
+        function updateContinuousValue() {
+            let slider = document.getElementById("continuousSlider");
+            let output = document.getElementById("continuousResult");
+            output.innerHTML = "Seçilen Değer: " + slider.value;
+        }
+
+        function generateDiscreteValue() {
+            let values = [1, 2, 3, 4, 5, 6]; // Zar atma örneği
+            let randomValue = values[Math.floor(Math.random() * values.length)];
+            let output = document.getElementById("discreteResult");
+            output.innerHTML = "Seçilen Değer: " + randomValue;
+        }
+    </script>
+</body>
+</html>
