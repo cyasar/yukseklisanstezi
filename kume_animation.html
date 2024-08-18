@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bloch Sphere Animation</title>
+    <style>
+        body { margin: 0; overflow: hidden; }
+        canvas { display: block; }
+    </style>
+</head>
+<body>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script>
+        // Sahne, kamera ve renderer oluşturma
+        const scene = new THREE.Scene();
+        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+        const renderer = new THREE.WebGLRenderer();
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        document.body.appendChild(renderer.domElement);
+
+        // Bloch küresi için küre geometrisi ve malzeme
+        const sphereGeometry = new THREE.SphereGeometry(1, 32, 32);
+        const sphereMaterial = new THREE.MeshBasicMaterial({ color: 0x0077ff, wireframe: true });
+        const sphere = new THREE.Mesh(sphereGeometry, sphereMaterial);
+        scene.add(sphere);
+
+        // Qubit durumunu temsil eden bir vektör (örneğin |ψ⟩ = |0⟩)
+        const qubitVectorMaterial = new THREE.LineBasicMaterial({ color: 0xff0000 });
+        const qubitVectorGeometry = new THREE.BufferGeometry().setFromPoints([
+            new THREE.Vector3(0, 0, 0),
+            new THREE.Vector3(0, 1, 0)
+        ]);
+        const qubitVector = new THREE.Line(qubitVectorGeometry, qubitVectorMaterial);
+        scene.add(qubitVector);
+
+        // Işık ekleme
+        const light = new THREE.PointLight(0xffffff, 1);
+        light.position.set(5, 5, 5);
+        scene.add(light);
+
+        // Kamerayı sahneye yerleştirme
+        camera.position.z = 3;
+
+        // Animasyon fonksiyonu
+        function animate() {
+            requestAnimationFrame(animate);
+
+            // Qubit vektörünü döndürme (animasyon)
+            qubitVector.rotation.x += 0.01;
+            qubitVector.rotation.y += 0.01;
+            qubitVector.rotation.z += 0.01;
+
+            renderer.render(scene, camera);
+        }
+
+        // Pencere boyutu değişikliklerine göre yeniden boyutlandırma
+        window.addEventListener('resize', () => {
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+        });
+
+        // Animasyonu başlatma
+        animate();
+    </script>
+</body>
+</html>
