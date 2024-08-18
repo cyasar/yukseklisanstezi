@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Değişken Kavramı Simülasyonu</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            padding: 20px;
+        }
+        .container {
+            margin: 20px auto;
+            width: 300px;
+        }
+        #continuousResult, #discreteResult {
+            font-size: 24px;
+            margin-top: 10px;
+            font-weight: bold;
+        }
+        .equation {
+            font-size: 18px;
+            margin-top: 15px;
+            font-style: italic;
+        }
+    </style>
+</head>
+<body>
+    <h1>Değişken Kavramı Simülasyonu</h1>
+    
+    <div class="container">
+        <h2>Sürekli Değişken</h2>
+        <input type="range" id="continuousSlider" min="0" max="100" value="50" step="0.01" oninput="updateContinuousValue()">
+        <div id="continuousResult">Seçilen Değer: 50</div>
+        <div class="equation">
+            \(\int_{a}^{b} f(x) dx\) <br> 
+            \(\int_{0}^{100} f(x) dx = \int_{0}^{\text{Seçilen Değer}} f(x) dx \)
+        </div>
+    </div>
+
+    <div class="container">
+        <h2>Kesikli Değişken</h2>
+        <button onclick="generateDiscreteValue()">Rastgele Bir Değer Seç</button>
+        <div id="discreteResult">Seçilen Değer: 1</div>
+        <div class="equation">
+            \(\sum_{i=1}^{n} f(x_i)\) <br> 
+            \(\sum_{i=1}^{\text{Seçilen Değer}} f(x_i)\)
+        </div>
+    </div>
+
+    <script>
+        function updateContinuousValue() {
+            let slider = document.getElementById("continuousSlider");
+            let output = document.getElementById("continuousResult");
+            output.innerHTML = "Seçilen Değer: " + slider.value;
+            
+            let equation = document.querySelector('.container .equation');
+            equation.innerHTML = "\\(\\int_{0}^{100} f(x) dx = \\int_{0}^{"+ slider.value +"} f(x) dx\\)";
+            MathJax.typeset();
+        }
+
+        function generateDiscreteValue() {
+            let values = [1, 2, 3, 4, 5, 6]; // Zar atma örneği
+            let randomValue = values[Math.floor(Math.random() * values.length)];
+            let output = document.getElementById("discreteResult");
+            output.innerHTML = "Seçilen Değer: " + randomValue;
+            
+            let equation = document.querySelector('.container:nth-of-type(2) .equation');
+            equation.innerHTML = "\\(\\sum_{i=1}^{n} f(x_i)\\) <br> \\(\\sum_{i=1}^{"+ randomValue +"} f(x_i)\\)";
+            MathJax.typeset();
+        }
+    </script>
+    
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+</body>
+</html>
