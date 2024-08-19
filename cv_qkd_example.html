@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CV-QKD Simulation</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+        }
+        canvas {
+            border: 1px solid black;
+        }
+    </style>
+</head>
+<body>
+
+<h1>CV-QKD Simulation</h1>
+<canvas id="myChart" width="600" height="400"></canvas>
+<p id="keys"></p>
+
+<script>
+    // Parametreler
+    const numSamples = 1000; // Kuantum durumlarının sayısı (örnek sayısı)
+    const r = 0.5;  // Sıkıştırma parametresi
+    const theta = Math.PI / 4; // Homodin dedeksiyon açısı (45 derece)
+
+    // Anahtar listeleri
+    const privateKey = [];
+    const publicKey = [];
+
+    // Sıkıştırma ve ölçüm simülasyonu
+    for (let i = 0; i < numSamples; i++) {
+        // Rastgele bir ölçüm değeri simülasyonu
+        const measurement = Math.cos(theta) * (Math.random() - 0.5) + Math.sin(theta) * (Math.random() - 0.5);
+        privateKey.push(measurement);
+
+        // Gürültü eklenmiş ortak anahtar
+        publicKey.push(measurement + (Math.random() - 0.5) * 0.2);
+    }
+
+    // Anahtarların ilk 10 değerini ekrana yazdırma
+    document.getElementById('keys').innerHTML = `
+        <strong>Private Key (first 10):</strong> ${privateKey.slice(0, 10).map(v => v.toFixed(2)).join(", ")}<br>
+        <strong>Public Key (first 10):</strong> ${publicKey.slice(0, 10).map(v => v.toFixed(2)).join(", ")}
+    `;
+
+    // Histogram çizim fonksiyonu
+    function drawHistogram(context, data, color, label, offsetX) {
+        const binWidth = 5;
+        const bins = new Array(40).fill(0);
+        
+        data.forEach(value => {
+            const bin = Math.floor((value + 2) * 10);
+            if (bin >= 0 && bin < bins.length) {
+                bins[bin]++;
+            }
+        });
+
+        const maxBin = Math.max(...bins);
+        bins.forEach((count, i) => {
+            context.fillStyle = color;
+            const height = (count / maxBin) * 300;
+            context.fillRect(offsetX + i * binWidth, 400 - height, binWidth, height);
+        });
+
+        context.fillStyle = "black";
+        context.fillText(label, offsetX + bins.length * binWidth / 2, 420);
+    }
+
+    // Canvas üzerinde histogram çizimi
+    const canvas = document.getElementById('myChart');
+    const context = canvas.getContext('2d');
+
+    drawHistogram(context, privateKey, 'blue', 'Private Key', 50);
+    drawHistogram(context, publicKey, 'green', 'Public Key', 350);
+
+</script>
+
+</body>
+</html>
