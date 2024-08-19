@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quantum Digital Signature (QDS) - COMU</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+        }
+        canvas {
+            border: 1px solid black;
+        }
+        .signature-container {
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+
+<h1>Quantum Digital Signature (QDS)</h1>
+<p>Digitally signing the word: <strong>"COMU"</strong></p>
+
+<canvas id="signatureCanvas" width="600" height="400"></canvas>
+<div class="signature-container">
+    <button onclick="sendSignature()">Send Signature</button>
+    <p id="signatureDetails"></p>
+    <p id="result"></p>
+</div>
+
+<script>
+    // Parametreler
+    const r = 0.5;  // Sıkıştırma parametresi
+    const theta = Math.PI / 4; // Homodin dedeksiyon açısı (45 derece)
+    const word = "COMU";  // İmzalanacak kelime
+
+    // Sıkıştırma ve ölçüm simülasyonu
+    function generateQuantumState(char) {
+        const charCode = char.charCodeAt(0);  // Karakterin ASCII kodu
+        const baseState = (charCode % 10) / 10;  // Basit bir mod 10 işlemi ile temel durum oluşturma
+        const squeezedValue = baseState + Math.random() * 0.1;  // Sıkıştırma ile küçük bir rastgelelik ekleme
+        const measurement = Math.cos(theta) * squeezedValue + Math.sin(theta) * (Math.random() - 0.5);
+        return { baseState, measurement };
+    }
+
+    // İmza oluşturma
+    function createSignature() {
+        const signature = [];
+        for (let char of word) {
+            signature.push(generateQuantumState(char));
+        }
+        return signature;
+    }
+
+    // İmza gönderimi ve doğrulama
+    function sendSignature() {
+        const signature = createSignature();
+
+        // Basit doğrulama - Orijinal durumu Bob ve Charlie'nin ölçümleriyle karşılaştırma
+        const bobMeasurements = signature.map(sig => sig.measurement + (Math.random() - 0.5) * 0.2);  // Bob'un ölçümü (gürültülü)
+        const charlieMeasurements = signature.map(sig => sig.measurement + (Math.random() - 0.5) * 0.2);  // Charlie'nin ölçümü (gürültülü)
+
+        let bobAgreement = 0;
+        let charlieAgreement = 0;
+
+        for (let i = 0; i < signature.length; i++) {
+            if (Math.abs(signature[i].measurement - bobMeasurements[i]) < 0.2) {
+                bobAgreement++;
+            }
+            if (Math.abs(signature[i].measurement - charlieMeasurements[i]) < 0.2) {
+                charlieAgreement++;
+            }
+        }
+
+        const signatureDetails = signature.map((sig, index) => 
+            `<strong>Character:</strong> ${word[index]}, 
+            <strong>Base State:</strong> ${sig.baseState.toFixed(2)}, 
+            <strong>Measurement:</strong> ${sig.measurement.toFixed(2)}`
+        ).join("<br>");
+
+        const resultText = `Bob Agreement: ${bobAgreement}/${signature.length}, Charlie Agreement: ${charlieAgreement}/${signature.length}`;
+
+        document.getElementById('signatureDetails').innerHTML = `<h3>Signature Details</h3>${signatureDetails}<br><br>`;
+        document.getElementById('result').innerHTML = `<h3>Result</h3>${resultText}`;
+
+        // İmza sonuçlarını gösterme
+        drawSignature(signature.map(sig => sig.measurement), bobMeasurements, charlieMeasurements);
+    }
+
+    // İmza grafiğini çizme
+    function drawSignature(original, bob, charlie) {
+        const canvas = document.getElementById('signatureCanvas');
+        const context = canvas.getContext('2d');
+        context.clearRect(0, 0, canvas.width, canvas.height);
+
+        const xOffset = 100;
+        const yOffset = 200;
+        const scale = 100;
+
+        context.beginPath();
+        context.moveTo(xOffset, yOffset - original[0] * scale);
+        original.forEach((val, i) => {
+            context.lineTo(xOffset + i * 100, yOffset - val * scale);
+        });
+        context.strokeStyle = 'blue';
+        context.stroke();
+        context.fillStyle = 'blue';
+        context.fillText("Original Signature", xOffset, yOffset - original[0] * scale - 10);
+
+        context.beginPath();
+        context.moveTo(xOffset, yOffset - bob[0] * scale);
+        bob.forEach((val, i) => {
+            context.lineTo(xOffset + i * 100, yOffset - val * scale);
+        });
+        context.strokeStyle = 'green';
+        context.stroke();
+        context.fillStyle = 'green';
+        context.fillText("Bob's Measurement", xOffset, yOffset - bob[0] * scale - 10);
+
+        context.beginPath();
+        context.moveTo(xOffset, yOffset - charlie[0] * scale);
+        charlie.forEach((val, i) => {
+            context.lineTo(xOffset + i * 100, yOffset - val * scale);
+        });
+        context.strokeStyle = 'red';
+        context.stroke();
+        context.fillStyle = 'red';
+        context.fillText("Charlie's Measurement", xOffset, yOffset - charlie[0] * scale - 10);
+    }
+</script>
+
+</body>
+</html>
