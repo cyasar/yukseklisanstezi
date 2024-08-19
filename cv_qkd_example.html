@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CV-QKD Simulation</title>
+    <title>CV-QKD Simulation with Sliders</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -17,39 +17,87 @@
         canvas {
             border: 1px solid black;
         }
+        .slider-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        .slider-container label {
+            margin: 5px 0;
+        }
     </style>
 </head>
 <body>
 
 <h1>CV-QKD Simulation</h1>
+
+<div class="slider-container">
+    <label for="numSamples">Number of Samples: <span id="numSamplesValue">1000</span></label>
+    <input type="range" id="numSamples" min="100" max="5000" value="1000" step="100">
+    
+    <label for="rValue">Squeezing Parameter (r): <span id="rValueLabel">0.5</span></label>
+    <input type="range" id="rValue" min="0.1" max="2" value="0.5" step="0.1">
+</div>
+
 <canvas id="myChart" width="600" height="400"></canvas>
 <p id="keys"></p>
 
 <script>
     // Parametreler
-    const numSamples = 1000; // Kuantum durumlarının sayısı (örnek sayısı)
-    const r = 0.5;  // Sıkıştırma parametresi
+    let numSamples = 1000; // Kuantum durumlarının sayısı (örnek sayısı)
+    let r = 0.5;  // Sıkıştırma parametresi
     const theta = Math.PI / 4; // Homodin dedeksiyon açısı (45 derece)
 
-    // Anahtar listeleri
-    const privateKey = [];
-    const publicKey = [];
+    const numSamplesSlider = document.getElementById('numSamples');
+    const rValueSlider = document.getElementById('rValue');
+    const numSamplesLabel = document.getElementById('numSamplesValue');
+    const rValueLabel = document.getElementById('rValueLabel');
 
-    // Sıkıştırma ve ölçüm simülasyonu
-    for (let i = 0; i < numSamples; i++) {
-        // Rastgele bir ölçüm değeri simülasyonu
-        const measurement = Math.cos(theta) * (Math.random() - 0.5) + Math.sin(theta) * (Math.random() - 0.5);
-        privateKey.push(measurement);
+    // Sürgülerde değişiklik olunca simülasyonu güncelle
+    numSamplesSlider.addEventListener('input', () => {
+        numSamples = parseInt(numSamplesSlider.value);
+        numSamplesLabel.textContent = numSamples;
+        updateSimulation();
+    });
 
-        // Gürültü eklenmiş ortak anahtar
-        publicKey.push(measurement + (Math.random() - 0.5) * 0.2);
+    rValueSlider.addEventListener('input', () => {
+        r = parseFloat(rValueSlider.value);
+        rValueLabel.textContent = r.toFixed(1);
+        updateSimulation();
+    });
+
+    // Simülasyonu güncelleyen fonksiyon
+    function updateSimulation() {
+        // Anahtar listeleri
+        const privateKey = [];
+        const publicKey = [];
+
+        // Sıkıştırma ve ölçüm simülasyonu
+        for (let i = 0; i < numSamples; i++) {
+            // Rastgele bir ölçüm değeri simülasyonu
+            const measurement = Math.cos(theta) * (Math.random() - 0.5) + Math.sin(theta) * (Math.random() - 0.5);
+            privateKey.push(measurement);
+
+            // Gürültü eklenmiş ortak anahtar
+            publicKey.push(measurement + (Math.random() - 0.5) * 0.2);
+        }
+
+        // Anahtarların ilk 10 değerini ekrana yazdırma
+        document.getElementById('keys').innerHTML = `
+            <strong>Private Key (first 10):</strong> ${privateKey.slice(0, 10).map(v => v.toFixed(2)).join(", ")}<br>
+            <strong>Public Key (first 10):</strong> ${publicKey.slice(0, 10).map(v => v.toFixed(2)).join(", ")}
+        `;
+
+        // Canvas'ı temizle
+        const canvas = document.getElementById('myChart');
+        const context = canvas.getContext('2d');
+        context.clearRect(0, 0, canvas.width, canvas.height);
+
+        // Yeni histogramı çiz
+        drawHistogram(context, privateKey, 'blue', 'Private Key', 50);
+        drawHistogram(context, publicKey, 'green', 'Public Key', 350);
     }
-
-    // Anahtarların ilk 10 değerini ekrana yazdırma
-    document.getElementById('keys').innerHTML = `
-        <strong>Private Key (first 10):</strong> ${privateKey.slice(0, 10).map(v => v.toFixed(2)).join(", ")}<br>
-        <strong>Public Key (first 10):</strong> ${publicKey.slice(0, 10).map(v => v.toFixed(2)).join(", ")}
-    `;
 
     // Histogram çizim fonksiyonu
     function drawHistogram(context, data, color, label, offsetX) {
@@ -74,12 +122,8 @@
         context.fillText(label, offsetX + bins.length * binWidth / 2, 420);
     }
 
-    // Canvas üzerinde histogram çizimi
-    const canvas = document.getElementById('myChart');
-    const context = canvas.getContext('2d');
-
-    drawHistogram(context, privateKey, 'blue', 'Private Key', 50);
-    drawHistogram(context, publicKey, 'green', 'Public Key', 350);
+    // İlk simülasyonu çalıştır
+    updateSimulation();
 
 </script>
 
